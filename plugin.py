@@ -86,7 +86,7 @@ class BasePlugin:
             if (p_now >= p_max): nVal = 1
             for d in Devices:
                 Devices[d].Update(nVal, str(percent))
-            Domoticz.Log(str(percent))
+            #Domoticz.Log(str(percent))
             if (p_now == p_dst): 
                 Domoticz.Heartbeat(10);
                 self.NextUpdate=3;
