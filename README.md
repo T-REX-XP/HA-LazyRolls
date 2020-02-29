@@ -5,7 +5,7 @@ Automatic motorized roller blinds project. Domoticz plugin
 Моторизированный привод для рулонных штор. Плагин для Domoticz
 
 ### Ссылки / Links
-Описание проекта / main project: [https://github.com/ACE1046/LazyRolls](https://github.com/ACE1046/LazyRolls)\
+Описание проекта / main project: [https://github.com/ACE1046/LazyRolls](https://github.com/ACE1046/LazyRolls)
 
 ### Changelog
 
