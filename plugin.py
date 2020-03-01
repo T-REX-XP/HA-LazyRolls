@@ -119,7 +119,7 @@ class BasePlugin:
         if (self.NextUpdate > 0): self.NextUpdate=self.NextUpdate-1;
         if (self.NextUpdate == 0):
             NextUpdate=3;
-            if (self.httpXml.Connected()): Connection.Disconnect()
+            if (self.httpXml.Connected()): self.httpXml.Disconnect()
             self.httpXml.Connect()
 
 
