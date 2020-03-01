@@ -3,9 +3,10 @@
 # Author: ACE ace@imlazy.ru 
 #
 # v0.01 29.02.2020
+# v0.02 30.02.2020 Fixed some errors in domoticz log file
 #
 """
-<plugin key="LazyRolls" name="LazyRolls roller blinds" author="ACE" version="0.01" wikilink="http://imlazy.ru/rolls/domoticz.html" externallink="http://imlazy.ru/">
+<plugin key="LazyRolls" name="LazyRolls roller blinds" author="ACE" version="0.02" wikilink="http://imlazy.ru/rolls/domoticz.html" externallink="http://imlazy.ru/">
     <description>
         <h2>LazyRolls roller blinds plugin</h2><br/>
         <h3>Configuration</h3>
@@ -96,7 +97,7 @@ class BasePlugin:
                 self.NextUpdate=1;
                 #Domoticz.Log('1s')
 
-        Connection.Disconnect()
+        if (Connection.Connected()): Connection.Disconnect()
 
     def onCommand(self, Unit, Command, Level, Hue):
         #Domoticz.Log("onCommand called for Unit " + str(Unit) + ": Parameter '" + str(Command) + "', Level: " + str(Level))
@@ -117,6 +118,8 @@ class BasePlugin:
         # Domoticz.Log("onHeartbeat called")
         if (self.NextUpdate > 0): self.NextUpdate=self.NextUpdate-1;
         if (self.NextUpdate == 0):
+            NextUpdate=3;
+            if (self.httpXml.Connected()): Connection.Disconnect()
             self.httpXml.Connect()
 
 
