@@ -4,9 +4,10 @@
 #
 # v0.01 29.02.2020
 # v0.02 30.02.2020 Fixed some errors in domoticz log file
+# v0.03 30.02.2020 Fixed some more errors in domoticz log file
 #
 """
-<plugin key="LazyRolls" name="LazyRolls roller blinds" author="ACE" version="0.02" wikilink="http://imlazy.ru/rolls/domoticz.html" externallink="http://imlazy.ru/">
+<plugin key="LazyRolls" name="LazyRolls roller blinds" author="ACE" version="0.03" wikilink="http://imlazy.ru/rolls/domoticz.html" externallink="http://imlazy.ru/">
     <description>
         <h2>LazyRolls roller blinds plugin</h2><br/>
         <h3>Configuration</h3>
@@ -73,29 +74,32 @@ class BasePlugin:
             self.NextUpdate=1;
 
         if (Connection == self.httpXml):
-            strData = Data["Data"].decode("utf-8", "ignore")
-            #Domoticz.Log("onMessage Xml called")
-            import xml.etree.ElementTree as ET
-            root = ET.fromstring(strData)
-            p_now = int(root.find("Position/Now").text)
-            p_dst = int(root.find("Position/Dest").text)
-            p_max = int(root.find("Position/Max").text)
-            if (p_max == 0): p_max=100;
-            percent = round(p_now*100/p_max)
-            nVal = 2
-            if (p_now <= 0): nVal = 0
-            if (p_now >= p_max): nVal = 1
-            for d in Devices:
-                Devices[d].Update(nVal, str(percent))
-            #Domoticz.Log(str(percent))
-            if (p_now == p_dst): 
-                Domoticz.Heartbeat(10);
-                self.NextUpdate=3;
-                #Domoticz.Log('30s')
-            else:
-                Domoticz.Heartbeat(1);
-                self.NextUpdate=1;
-                #Domoticz.Log('1s')
+            try:
+                strData = Data["Data"].decode("utf-8", "ignore")
+                #Domoticz.Log("onMessage Xml called")
+                import xml.etree.ElementTree as ET
+                root = ET.fromstring(strData)
+                p_now = int(root.find("Position/Now").text)
+                p_dst = int(root.find("Position/Dest").text)
+                p_max = int(root.find("Position/Max").text)
+                if (p_max == 0): p_max=100;
+                percent = round(p_now*100/p_max)
+                nVal = 2
+                if (p_now <= 0): nVal = 0
+                if (p_now >= p_max): nVal = 1
+                for d in Devices:
+                    Devices[d].Update(nVal, str(percent))
+                #Domoticz.Log(str(percent))
+                if (p_now == p_dst): 
+                    Domoticz.Heartbeat(10);
+                    self.NextUpdate=3;
+                    #Domoticz.Log('30s')
+                else:
+                    Domoticz.Heartbeat(1);
+                    self.NextUpdate=1;
+                    #Domoticz.Log('1s')
+            except:
+                pass
 
         if (Connection.Connected()): Connection.Disconnect()
 
@@ -119,8 +123,10 @@ class BasePlugin:
         if (self.NextUpdate > 0): self.NextUpdate=self.NextUpdate-1;
         if (self.NextUpdate == 0):
             NextUpdate=3;
-            if (self.httpXml.Connected()): self.httpXml.Disconnect()
-            self.httpXml.Connect()
+            if (self.httpXml.Connected() or self.httpXml.Connecting()): 
+                self.httpXml.Disconnect()
+            else:
+                self.httpXml.Connect()
 
 
 global _plugin

@@ -27,6 +27,9 @@ sudo systemctl restart domoticz.service
 30.02.2020 v0.02 beta\
 Fixed some errors in domoticz log file
 
+04.03.2020 v0.03 beta\
+Fixed some more errors in domoticz log file
+
 ### Authors
 
 * **ACE** - [e-mail](mailto:a_c_e@mail.ru)
