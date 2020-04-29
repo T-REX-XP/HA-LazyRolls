@@ -26,8 +26,8 @@ COVER_SCHEMA = vol.Schema({
 })
 
 pos = '/set?pos='
-blindDown = 'http://{}:80'+ pos
-blindUp = 'http://{}:80'+ pos
+blindDown = 'http://{}:80'+ pos+"{}"
+blindUp = 'http://{}:80'+ pos+"{}"
 blindStop = 'http://{}:80/stop'
 blindStatus = 'http://{}:80/xml'
 
