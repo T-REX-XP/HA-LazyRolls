@@ -6,7 +6,7 @@ import voluptuous as vol
 from homeassistant.components.cover import (
     CoverDevice, PLATFORM_SCHEMA, SUPPORT_OPEN, SUPPORT_CLOSE, SUPPORT_STOP, SUPPORT_SET_POSITION)
 from homeassistant.const import (
-    CONF_IP_ADDRESS, CONF_ID, CONF_CODE, CONF_NAME, CONF_COVERS, CONF_DEVICE, STATE_CLOSED, STATE_OPEN, STATE_UNKNOWN)
+    CONF_IP_ADDRESS, CONF_ID, CONF_CODE, CONF_NAME, CONF_COVERS, CONF_DEVICE, STATE_CLOSED, STATE_OPEN, STATE_UNKNOWN,CONF_FRIENDLY_NAME)
 import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ STATE_STOPPED = 'stopped'
 
 COVER_SCHEMA = vol.Schema({
     vol.Required(CONF_IP_ADDRESS): cv.string,
-    vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+    vol.Optional(CONF_FRIENDLY_NAME, default=DEFAULT_NAME): cv.string,
 })
 
 pos = '/set?pos='
@@ -44,10 +44,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     for device_id, device_config in devices.items():
         args = {
             CONF_IP_ADDRESS: device_config.get(CONF_IP_ADDRESS),
-#            CONF_ID: device_config.get(CONF_ID),
-#            CONF_CODE: device_config.get(CONF_CODE),
-            CONF_NAME: device_config.get(CONF_NAME),
-#            CONF_DEVICE_ID: device_config.get(CONF_DEVICE, device_id),
+            CONF_FRIENDLY_NAME: device_config.get(CONF_FRIENDLY_NAME),
         }
 
         covers.append(lazyrolls(hass, args))
@@ -62,11 +59,8 @@ class lazyrolls(CoverDevice):
     def __init__(self, hass, args):
         """Initialize the cover."""
         self.hass = hass
-        self._name = args[CONF_NAME]
-        self.device_id = args['device_id']
+        self._name = args[CONF_FRIENDLY_NAME]
         self._ip_addr = args[CONF_IP_ADDRESS]
-#        self._id = args[CONF_ID]
-#        self._code = args[CONF_CODE]
         self._available = True
         self._state = None
 
@@ -101,12 +95,12 @@ class lazyrolls(CoverDevice):
     def stop_cover(self):
         """Stop the cover."""
         requests.get(blindStop.format(self._ip_addr, self._code))
-        
+
     def set_cover_position(self, **kwargs):
         """Move the cover to a specific position."""
-        requests.get(blindUp.format(self._ip_addr, [int(kwargs['position'])]))        
-            _LOGGER.debug("Writing Set position to " + self._name + " : " + self._mac + " - " + str(kwargs['position']) + " was succesfull!")
-       
+        requests.get(blindUp.format(self._ip_addr, [int(kwargs['position'])]))
+        _LOGGER.debug("Writing Set position to " + self._name + " : " + self._ip_addr + " - " + str(kwargs['position']) + " was succesfull!")
+
 
     @property
     def device_class(self):
