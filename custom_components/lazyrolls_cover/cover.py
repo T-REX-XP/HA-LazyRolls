@@ -87,7 +87,7 @@ class lazyrolls(CoverDevice):
 
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
-        _LOGGER.debug("Status: " + self._name + " : " + self._ip_addr + " - " + response)
+        _LOGGER.debug("Status: " + self._name + " : " + self._ip_addr + " - " + str(response))
 
     @property
     def close_cover(self):
