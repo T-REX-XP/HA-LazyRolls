@@ -29,6 +29,8 @@ pos = '/set?pos='
 blindDown = 'http://{}:80'+ pos
 blindUp = 'http://{}:80'+ pos
 blindStop = 'http://{}:80/stop'
+blindStatus = 'http://{}:80/xml'
+
 ############
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -83,23 +85,31 @@ class lazyrolls(CoverDevice):
             return None
         return self._state in [STATE_CLOSED, STATE_OPENING]
 
+    def update(self):
+        response = requests.get(blindStatus.format(self._ip_addr))
+        _LOGGER.debug("Status: " + self._name + " : " + self._ip_addr + " - " + response)
+
     @property
     def close_cover(self):
         """Close the cover."""
         requests.get(blindDown.format(self._ip_addr, 0))
+        self.update()
 
     def open_cover(self):
         """Open the cover."""
         requests.get(blindUp.format(self._ip_addr, 100))
+        self.update()
 
     def stop_cover(self):
         """Stop the cover."""
         requests.get(blindStop.format(self._ip_addr))
+        self.update()
 
     def set_cover_position(self, **kwargs):
         """Move the cover to a specific position."""
         requests.get(blindUp.format(self._ip_addr, [int(kwargs['position'])]))
         _LOGGER.debug("Writing Set position to " + self._name + " : " + self._ip_addr + " - " + str(kwargs['position']) + " was succesfull!")
+        self.update()
 
 
     @property
