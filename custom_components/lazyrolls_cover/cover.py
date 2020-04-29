@@ -1,6 +1,6 @@
 import logging
 import requests
-
+from xml.etree import ElementTree
 import voluptuous as vol
 
 from homeassistant.components.cover import (
@@ -26,8 +26,8 @@ COVER_SCHEMA = vol.Schema({
 })
 
 pos = '/set?pos='
-blindDown = 'http://{}:80'+ pos+"{}"
-blindUp = 'http://{}:80'+ pos+"{}"
+blindDown = 'http://{}:80'+ pos+'{}'
+blindUp = 'http://{}:80'+ pos+'{}'
 blindStop = 'http://{}:80/stop'
 blindStatus = 'http://{}:80/xml'
 
@@ -87,7 +87,9 @@ class lazyrolls(CoverDevice):
 
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
-        _LOGGER.debug("Status: " + self._name + " : " + self._ip_addr + " - " + str(response))
+        tree = ElementTree.fromstring(response.content)
+        _LOGGER.debug("Status: " + self._name + " : " + self._ip_addr + " - " + str(response.status_code)+" "+ response.text)
+
 
     @property
     def close_cover(self):
