@@ -1,8 +1,8 @@
-﻿# LazyRolls Domoticz plugin
+﻿# LazyRolls Home Assistant plugin
 
-Automatic motorized roller blinds project. Domoticz plugin
+Automatic motorized roller blinds project. Home Assistant plugin
 
-Моторизированный привод для рулонных штор. Плагин для Domoticz
+Моторизированный привод для рулонных штор. Плагин для Home Assistant
 
 ### Ссылки / Links
 Описание проекта / main project: [https://github.com/ACE1046/LazyRolls](https://github.com/ACE1046/LazyRolls)
@@ -21,15 +21,5 @@ sudo systemctl restart domoticz.service
 
 ### Changelog
 
-29.02.2020 v0.01 beta\
+30.04.2020 v0.01 beta\
 Первая пробная версия
-
-30.02.2020 v0.02 beta\
-Fixed some errors in domoticz log file
-
-04.03.2020 v0.03 beta\
-Fixed some more errors in domoticz log file
-
-### Authors
-
-* **ACE** - [e-mail](mailto:a_c_e@mail.ru)
