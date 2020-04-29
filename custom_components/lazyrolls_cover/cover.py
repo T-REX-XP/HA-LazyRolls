@@ -4,7 +4,7 @@ import requests
 import voluptuous as vol
 
 from homeassistant.components.cover import (
-    CoverDevice, PLATFORM_SCHEMA, SUPPORT_OPEN, SUPPORT_CLOSE, SUPPORT_STOP)
+    CoverDevice, PLATFORM_SCHEMA, SUPPORT_OPEN, SUPPORT_CLOSE, SUPPORT_STOP, SUPPORT_SET_POSITION)
 from homeassistant.const import (
     CONF_IP_ADDRESS, CONF_ID, CONF_CODE, CONF_NAME, CONF_COVERS, CONF_DEVICE, STATE_CLOSED, STATE_OPEN, STATE_UNKNOWN)
 import homeassistant.helpers.config_validation as cv
@@ -23,14 +23,12 @@ STATE_STOPPED = 'stopped'
 COVER_SCHEMA = vol.Schema({
     vol.Required(CONF_IP_ADDRESS): cv.string,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-#    vol.Required(CONF_ID): cv.string,
-#    vol.Required(CONF_CODE): cv.string
 })
 
-blindDown = 'http://{}:80/neo/v1/transmit?command={}-dn&id={}'
-blindUp = 'http://{}:80/neo/v1/transmit?command={}-up&id={}'
-blindStop = 'http://{}:80/neo/v1/transmit?command={}-sp&id={}'
-
+pos = '/set?pos='
+blindDown = 'http://{}:80'+ pos
+blindUp = 'http://{}:80'+ pos
+blindStop = 'http://{}:80'+ pos
 ############
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -94,15 +92,21 @@ class lazyrolls(CoverDevice):
     @property
     def close_cover(self):
         """Close the cover."""
-        requests.get(blindDown.format(self._ip_addr, self._code))
+        requests.get(blindDown.format(self._ip_addr, 0))
 
     def open_cover(self):
         """Open the cover."""
-        requests.get(blindUp.format(self._ip_addr, self._code))
+        requests.get(blindUp.format(self._ip_addr, 100))
 
     def stop_cover(self):
         """Stop the cover."""
         requests.get(blindStop.format(self._ip_addr, self._code))
+        
+    def set_cover_position(self, **kwargs):
+        """Move the cover to a specific position."""
+        requests.get(blindUp.format(self._ip_addr, [int(kwargs['position'])]))        
+            _LOGGER.debug("Writing Set position to " + self._name + " : " + self._mac + " - " + str(kwargs['position']) + " was succesfull!")
+       
 
     @property
     def device_class(self):
@@ -112,4 +116,4 @@ class lazyrolls(CoverDevice):
     @property
     def supported_features(self):
         """Flag supported features."""
-        return SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_STOP
+        return SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_STOP | SUPPORT_SET_POSITION
