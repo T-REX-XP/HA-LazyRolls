@@ -4,5 +4,6 @@
   "documentation": "https://github.com/T-REX-XP/HA-LazyRolls/",
   "dependencies": [],
   "codeowners": ["T-REX-XP"],
+  "config_flow": true,
   "requirements": []
 }
