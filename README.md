@@ -2,7 +2,7 @@
 
 Automatic motorized roller blinds project. Home Assistant plugin
 
-Моторизированный привод для рулонных штор. Плагин для Home Assistant
+Моторизированный привод для рулонных штор(http://imlazy.ru/). Плагин для Home Assistant
 
 ### Ссылки / Links
 Описание проекта / main project: [https://github.com/ACE1046/LazyRolls](https://github.com/ACE1046/LazyRolls)
