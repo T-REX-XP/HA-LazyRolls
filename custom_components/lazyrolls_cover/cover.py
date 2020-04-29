@@ -28,7 +28,7 @@ COVER_SCHEMA = vol.Schema({
 pos = '/set?pos='
 blindDown = 'http://{}:80'+ pos
 blindUp = 'http://{}:80'+ pos
-blindStop = 'http://{}:80'+ pos
+blindStop = 'http://{}:80/stop'
 ############
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -94,7 +94,7 @@ class lazyrolls(CoverDevice):
 
     def stop_cover(self):
         """Stop the cover."""
-        requests.get(blindStop.format(self._ip_addr, self._code))
+        requests.get(blindStop.format(self._ip_addr))
 
     def set_cover_position(self, **kwargs):
         """Move the cover to a specific position."""
