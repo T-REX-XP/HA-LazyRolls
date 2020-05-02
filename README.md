@@ -26,8 +26,8 @@ You can install this customization via [https://hacs.xyz/](HACS), just add curre
 - Add config flow support
 
 ### Changelog
--02.05.2020 v0.02 beta\
+- 02.05.2020 v0.02 beta\
 Управление положением, обновление статуса
 
--30.04.2020 v0.01 beta\
+- 30.04.2020 v0.01 beta\
 Первая пробная версия
