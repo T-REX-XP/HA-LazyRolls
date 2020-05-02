@@ -81,7 +81,7 @@ class lazyrolls(CoverDevice):
     @property
     def is_closed(self):
         """Return if the cover is closed."""
-        return self.current_cover_position == 100
+        return self.current_cover_position == 0
 
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
@@ -91,7 +91,7 @@ class lazyrolls(CoverDevice):
         p_max = int(root.find("Position/Max").text)
         if (p_max == 0): p_max = 100;
         percent = round(p_now * 100 / p_max)
-        self._pos = percent
+        self._pos = 100 - percent
         nVal = 2
         if (p_now <= 0): nVal = 0
         if (p_now >= p_max): nVal = 1
