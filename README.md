@@ -23,7 +23,8 @@ Automatic motorized roller blinds project. Home Assistant plugin
 
 
 ### Changelog
-30.04.2020 v0.02 beta\
-- Управление положением, обновление статуса
-30.04.2020 v0.01 beta\
+-30.04.2020 v0.02 beta\
+Управление положением, обновление статуса
+
+-30.04.2020 v0.01 beta\
 Первая пробная версия
