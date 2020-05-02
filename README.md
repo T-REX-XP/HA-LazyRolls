@@ -20,6 +20,7 @@ Automatic motorized roller blinds project. Home Assistant plugin
 Описание проекта / main project: [https://github.com/ACE1046/LazyRolls](https://github.com/ACE1046/LazyRolls)
 
 ### Установка / Install
+You can install this customization via [https://hacs.xyz/](HACS), just add current repo url as an additional source on the setting of HACS
 
 
 ### Changelog
