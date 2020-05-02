@@ -22,6 +22,8 @@ Automatic motorized roller blinds project. Home Assistant plugin
 ### Установка / Install
 You can install this customization via [https://hacs.xyz/](HACS), just add current repo url as an additional source on the setting of HACS
 
+### TODO:
+- Add config flow support
 
 ### Changelog
 -02.05.2020 v0.02 beta\
