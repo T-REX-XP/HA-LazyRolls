@@ -13,8 +13,6 @@ _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_NAME = 'lazyrolls'
 
-CONF_DEVICE_ID = 'device_id'
-
 STATE_CLOSING = 'closing'
 STATE_OFFLINE = 'offline'
 STATE_OPENING = 'opening'
@@ -39,7 +37,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
-    """Set up the neocontroller covers."""
+    """Set up the LazyRolls covers."""
     covers = []
     devices = config.get(CONF_COVERS)
 
@@ -55,7 +53,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 
 
 class lazyrolls(CoverDevice):
-    """Representation of NeoController cover."""
+    """Representation of LazyRolls cover."""
 
     # pylint: disable=no-self-use
     def __init__(self, hass, args):
@@ -65,6 +63,8 @@ class lazyrolls(CoverDevice):
         self._ip_addr = args[CONF_IP_ADDRESS]
         self._available = True
         self._state = None
+        self._pos = 100
+        self.update()
 
     @property
     def name(self):
@@ -81,25 +81,37 @@ class lazyrolls(CoverDevice):
     @property
     def is_closed(self):
         """Return if the cover is closed."""
-        if self._state in [STATE_UNKNOWN, STATE_OFFLINE]:
-            return None
-        return self._state in [STATE_CLOSED, STATE_OPENING]
+        return self.current_cover_position == 100
 
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
-        tree = ElementTree.fromstring(response.content)
-        _LOGGER.debug("Status: " + self._name + " : " + self._ip_addr + " - " + str(response.status_code)+" "+ response.text)
+        root = ElementTree.fromstring(response.content)
+        p_now = int(root.find("Position/Now").text)
+        p_dst = int(root.find("Position/Dest").text)
+        p_max = int(root.find("Position/Max").text)
+        if (p_max == 0): p_max = 100;
+        percent = round(p_now * 100 / p_max)
+        self._pos = percent
+        nVal = 2
+        if (p_now <= 0): nVal = 0
+        if (p_now >= p_max): nVal = 1
+        _LOGGER.error("in update Status: " + self._name + " : " + self._ip_addr + " - percent: "+ str(percent))
+        #_LOGGER.debug("in update Status: " + self._name + " : " + self._ip_addr + " - " + str(response.status_code)+" "+ response.text)
 
+    @property
+    def current_cover_position(self):
+        """Return the current position of the cover."""
+        return self._pos
 
     @property
     def close_cover(self):
         """Close the cover."""
-        requests.get(blindDown.format(self._ip_addr, 0))
+        requests.get(blindDown.format(self._ip_addr, "100")) #0
         self.update()
 
     def open_cover(self):
         """Open the cover."""
-        requests.get(blindUp.format(self._ip_addr, 100))
+        requests.get(blindUp.format(self._ip_addr, "0")) #100
         self.update()
 
     def stop_cover(self):
@@ -109,10 +121,9 @@ class lazyrolls(CoverDevice):
 
     def set_cover_position(self, **kwargs):
         """Move the cover to a specific position."""
-        requests.get(blindUp.format(self._ip_addr, [int(kwargs['position'])]))
+        requests.get(blindUp.format(self._ip_addr, str(kwargs['position'])))
         _LOGGER.debug("Writing Set position to " + self._name + " : " + self._ip_addr + " - " + str(kwargs['position']) + " was succesfull!")
         self.update()
-
 
     @property
     def device_class(self):
