@@ -13,11 +13,6 @@ _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_NAME = 'lazyrolls'
 
-STATE_CLOSING = 'closing'
-STATE_OFFLINE = 'offline'
-STATE_OPENING = 'opening'
-STATE_STOPPED = 'stopped'
-
 COVER_SCHEMA = vol.Schema({
     vol.Required(CONF_IP_ADDRESS): cv.string,
     vol.Optional(CONF_FRIENDLY_NAME, default=DEFAULT_NAME): cv.string,
@@ -95,8 +90,7 @@ class lazyrolls(CoverDevice):
         nVal = 2
         if (p_now <= 0): nVal = 0
         if (p_now >= p_max): nVal = 1
-        _LOGGER.error("in update Status: " + self._name + " : " + self._ip_addr + " - percent: "+ str(percent))
-        #_LOGGER.debug("in update Status: " + self._name + " : " + self._ip_addr + " - " + str(response.status_code)+" "+ response.text)
+        _LOGGER.debug("in update Status: " + self._name + " : " + self._ip_addr + " - " + str(response.status_code)+" "+ response.text)
 
     @property
     def current_cover_position(self):
