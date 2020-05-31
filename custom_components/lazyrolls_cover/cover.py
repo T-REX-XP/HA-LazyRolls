@@ -61,16 +61,16 @@ class lazyrolls(CoverDevice):
         self._pos = 100
         self.update()
 
-    @property
-    def name(self):
-        """Return the name of the cover."""
-        return self._name
+#    @property
+#    def name(self):
+#        """Return the name of the cover."""
+#        return self._name
 
-    @property
-    def available(self):
-        """Return True if entity is available."""
-        return self._available
-
+#    @property
+#    def available(self):
+#        """Return True if entity is available."""
+#        return self._available
+#
     ################
 
     @property
@@ -97,7 +97,6 @@ class lazyrolls(CoverDevice):
         """Return the current position of the cover."""
         return self._pos
 
-    @property
     def close_cover(self):
         """Close the cover."""
         requests.get(blindDown.format(self._ip_addr, "100")) #0
