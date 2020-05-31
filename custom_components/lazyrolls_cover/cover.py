@@ -61,16 +61,16 @@ class lazyrolls(CoverDevice):
         self._pos = 100
         self.update()
 
-#    @property
-#    def name(self):
-#        """Return the name of the cover."""
-#        return self._name
+    @property
+    def name(self):
+        """Return the name of the cover."""
+        return self._name
 
-#    @property
-#    def available(self):
-#        """Return True if entity is available."""
-#        return self._available
-#
+    @property
+    def available(self):
+        """Return True if entity is available."""
+        return self._available
+
     ################
 
     @property
