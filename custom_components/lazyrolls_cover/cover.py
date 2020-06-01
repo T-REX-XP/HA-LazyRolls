@@ -77,6 +77,15 @@ class lazyrolls(CoverDevice):
     def is_closed(self):
         """Return if the cover is closed."""
         return self.current_cover_position == 0
+    @property
+    def unique_id(self):
+        """Return the unique ID."""
+        return self._name
+
+    @property
+    def device_info(self):
+        """Return the device info."""
+        return {"name": self._name, "identifiers": {(DOMAIN, self._unique_id)}, "model":"LazyRolls", "manufacturer":"LazyRolls"}
 
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
