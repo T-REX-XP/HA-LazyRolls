@@ -86,7 +86,7 @@ class lazyrolls(CoverDevice):
     @property
     def device_info(self):
         """Return the device info."""
-        return {"name": self._name, "identifiers": {(DOMAIN, self._unique_id)}, "model":"LazyRolls", "manufacturer":"LazyRolls"}
+        return {"name": self._name, "identifiers": {(DOMAIN, self.unique_id)}, "model":"LazyRolls", "manufacturer":"LazyRolls"}
 
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
