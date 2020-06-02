@@ -6,8 +6,11 @@ import voluptuous as vol
 from homeassistant.components.cover import (
     CoverDevice, PLATFORM_SCHEMA, SUPPORT_OPEN, SUPPORT_CLOSE, SUPPORT_STOP, SUPPORT_SET_POSITION)
 from homeassistant.const import (
-    CONF_IP_ADDRESS, CONF_ID, CONF_CODE, CONF_NAME, CONF_COVERS, CONF_DEVICE, STATE_CLOSED, STATE_OPEN, STATE_UNKNOWN,CONF_FRIENDLY_NAME)
+    CONF_IP_ADDRESS, CONF_ID, CONF_CODE, CONF_NAME, CONF_COVERS, CONF_DEVICE, STATE_CLOSED, STATE_OPEN, STATE_UNKNOWN,
+    CONF_FRIENDLY_NAME)
 import homeassistant.helpers.config_validation as cv
+# Inside a component
+from homeassistant.helpers import device_registry as dr
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,8 +23,8 @@ COVER_SCHEMA = vol.Schema({
 })
 
 pos = '/set?pos='
-blindDown = 'http://{}:80'+ pos+'{}'
-blindUp = 'http://{}:80'+ pos+'{}'
+blindDown = 'http://{}:80' + pos + '{}'
+blindUp = 'http://{}:80' + pos + '{}'
 blindStop = 'http://{}:80/stop'
 blindStatus = 'http://{}:80/xml'
 
@@ -36,11 +39,12 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     """Set up the LazyRolls covers."""
     covers = []
     devices = config.get(CONF_COVERS)
-
+    device_registry = await dr.async_get_registry(hass)
     for device_id, device_config in devices.items():
         args = {
             CONF_IP_ADDRESS: device_config.get(CONF_IP_ADDRESS),
             CONF_FRIENDLY_NAME: device_config.get(CONF_FRIENDLY_NAME),
+            "DR": device_registry
         }
 
         covers.append(lazyrolls(hass, args))
@@ -61,6 +65,7 @@ class lazyrolls(CoverDevice):
         self._state = None
         self._pos = 100
         self.update()
+        args["DR"].async_get_or_create(self.device_info)
 
     @property
     def name(self):
@@ -78,6 +83,7 @@ class lazyrolls(CoverDevice):
     def is_closed(self):
         """Return if the cover is closed."""
         return self.current_cover_position == 0
+
     @property
     def unique_id(self):
         """Return the unique ID."""
@@ -86,7 +92,11 @@ class lazyrolls(CoverDevice):
     @property
     def device_info(self):
         """Return the device info."""
-        return {"name": self._name, "identifiers": {(DOMAIN, self.unique_id)}, "model":"LazyRolls", "manufacturer":"LazyRolls"}
+        return {"name": self._name,
+                "identifiers": {(DOMAIN, self.unique_id)},
+                "model": "LazyRolls",
+                "manufacturer": "LazyRolls"
+                }
 
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
@@ -100,7 +110,8 @@ class lazyrolls(CoverDevice):
         nVal = 2
         if (p_now <= 0): nVal = 0
         if (p_now >= p_max): nVal = 1
-        _LOGGER.debug("in update Status: " + self._name + " : " + self._ip_addr + " - " + str(response.status_code)+" "+ response.text)
+        _LOGGER.debug("in update Status: " + self._name + " : " + self._ip_addr + " - " + str(
+            response.status_code) + " " + response.text)
 
     @property
     def current_cover_position(self):
@@ -109,12 +120,12 @@ class lazyrolls(CoverDevice):
 
     def close_cover(self):
         """Close the cover."""
-        requests.get(blindDown.format(self._ip_addr, "100")) #0
+        requests.get(blindDown.format(self._ip_addr, "100"))  # 0
         self.update()
 
     def open_cover(self):
         """Open the cover."""
-        requests.get(blindUp.format(self._ip_addr, "0")) #100
+        requests.get(blindUp.format(self._ip_addr, "0"))  # 100
         self.update()
 
     def stop_cover(self):
@@ -125,7 +136,8 @@ class lazyrolls(CoverDevice):
     def set_cover_position(self, **kwargs):
         """Move the cover to a specific position."""
         requests.get(blindUp.format(self._ip_addr, str(kwargs['position'])))
-        _LOGGER.debug("Writing Set position to " + self._name + " : " + self._ip_addr + " - " + str(kwargs['position']) + " was succesfull!")
+        _LOGGER.debug("Writing Set position to " + self._name + " : " + self._ip_addr + " - " + str(
+            kwargs['position']) + " was succesfull!")
         self.update()
 
     @property
