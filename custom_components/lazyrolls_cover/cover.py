@@ -35,21 +35,37 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 })
 
 
-def setup_platform(hass, config, add_devices, discovery_info=None):
-    """Set up the LazyRolls covers."""
-    covers = []
-    devices = config.get(CONF_COVERS)
+
+#def setup_platform(hass, config, add_devices, discovery_info=None):
+#    """Set up the LazyRolls covers."""
+#    covers = []
+#    devices = config.get(CONF_COVERS)
+#
+#    for device_id, device_config in devices.items():
+#        args = {
+#            CONF_IP_ADDRESS: device_config.get(CONF_IP_ADDRESS),
+#            CONF_FRIENDLY_NAME: device_config.get(CONF_FRIENDLY_NAME),
+#            #"DR": device_registry
+#        }
+#
+#        covers.append(lazyrolls(hass, args))
+
+#    add_devices(covers, True)
+async def async_setup_entry(hass, config_entry, async_add_entities):
     device_registry = await dr.async_get_registry(hass)
+    covers = []
+    devices = config_entry.get(CONF_COVERS)
+
     for device_id, device_config in devices.items():
         args = {
             CONF_IP_ADDRESS: device_config.get(CONF_IP_ADDRESS),
             CONF_FRIENDLY_NAME: device_config.get(CONF_FRIENDLY_NAME),
-            "DR": device_registry
+            # "DR": device_registry
         }
 
         covers.append(lazyrolls(hass, args))
 
-    add_devices(covers, True)
+    async_add_entities(covers, True)
 
 
 class lazyrolls(CoverDevice):
@@ -65,7 +81,7 @@ class lazyrolls(CoverDevice):
         self._state = None
         self._pos = 100
         self.update()
-        await args["DR"].async_get_or_create(self.device_info)
+
 
     @property
     def name(self):
