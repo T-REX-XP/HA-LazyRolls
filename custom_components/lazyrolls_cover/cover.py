@@ -65,7 +65,7 @@ class lazyrolls(CoverDevice):
         self._state = None
         self._pos = 100
         self.update()
-        args["DR"].async_get_or_create(self.device_info)
+        await args["DR"].async_get_or_create(self.device_info)
 
     @property
     def name(self):
