@@ -12,7 +12,7 @@ import homeassistant.helpers.config_validation as cv
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_NAME = 'lazyrolls'
-DOMAIN = 'lazyrolls'
+DOMAIN = 'cover'
 
 COVER_SCHEMA = vol.Schema({
     vol.Required(CONF_IP_ADDRESS): cv.string,
