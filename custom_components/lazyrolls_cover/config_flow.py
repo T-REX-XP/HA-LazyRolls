@@ -1,78 +1,90 @@
-"""Config flow for the Abode Security System component."""
-#from abodepy import Abode
-#from abodepy.exceptions import AbodeException
-from requests.exceptions import ConnectTimeout, HTTPError
-import voluptuous as vol
+
+"""Config flow to configure LazyRolls."""
 import logging
+
+import voluptuous as vol
+
 from homeassistant import config_entries
-from homeassistant.const import CONF_IP_ADDRESS, CONF_FRIENDLY_NAME, HTTP_BAD_REQUEST
-from homeassistant.core import callback
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_FRIENDLY_NAME
+from homeassistant.helpers.device_registry import format_mac
 
-#from .const import DEFAULT_CACHEDB, DOMAIN, LOGGER  # pylint: disable=unused-import
+# pylint: disable=unused-import
+from .const import DOMAIN
+from .gateway import ConnectXiaomiGateway
 
-CONF_POLLING = "polling"
 _LOGGER = logging.getLogger(__name__)
 
+CONF_FLOW_TYPE = "config_flow_device"
+CONF_GATEWAY = "gateway"
+DEFAULT_GATEWAY_NAME = "LazyRolls Cover"
+
+GATEWAY_SETTINGS = {
+    vol.Required(CONF_HOST): vol.All(str, vol.Length(min=32, max=32)),
+    vol.Optional(CONF_NAME, default=DEFAULT_GATEWAY_NAME): str,
+}
+GATEWAY_CONFIG = vol.Schema({vol.Required(CONF_HOST): str}).extend(GATEWAY_SETTINGS)
+
+CONFIG_SCHEMA = vol.Schema({vol.Optional(CONF_GATEWAY, default=False): bool})
+
+
 class LazyRollsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for Abode."""
+    """Handle a Xiaomi Miio config flow."""
 
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
     def __init__(self):
         """Initialize."""
-        self.data_schema = {
-            vol.Required(CONF_IP_ADDRESS): str,
-            vol.Required(CONF_FRIENDLY_NAME): str,
-        }
+        self.host = None
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
-        if self._async_current_entries():
-            return self.async_abort(reason="single_instance_allowed")
+        errors = {}
+        if user_input is not None:
+            # Check which device needs to be connected.
+            if user_input[CONF_GATEWAY]:
+                return await self.async_step_gateway()
 
-        if not user_input:
-            return self._show_form()
+            errors["base"] = "no_device_selected"
 
-        ip = user_input[CONF_IP_ADDRESS]
-        friendly_name = user_input[CONF_FRIENDLY_NAME]
-        polling = user_input.get(CONF_POLLING, False)
-        #cache = self.hass.config.path(DEFAULT_CACHEDB)
-
-        try:
-            _LOGGER.error("In step user")
-            await self.hass.async_add_executor_job(
-                #Abode, username, password, True, True, True, cache
-            )
-
-        except (ConnectTimeout, HTTPError) as ex:
-            _LOGGER.error("Unable to connect to Abode: %s", str(ex))
-            if ex.errcode == HTTP_BAD_REQUEST:
-                return self._show_form({"base": "invalid_credentials"})
-            return self._show_form({"base": "connection_error"})
-
-        return self.async_create_entry(
-            title=user_input[CONF_FRIENDLY_NAME],
-            data={
-                CONF_IP_ADDRESS: ip,
-                CONF_FRIENDLY_NAME: friendly_name,
-                CONF_POLLING: polling,
-            },
-        )
-
-    @callback
-    def _show_form(self, errors=None):
-        """Show the form to the user."""
         return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(self.data_schema),
-            errors=errors if errors else {},
+            step_id="user", data_schema=CONFIG_SCHEMA, errors=errors
         )
 
-    async def async_step_import(self, import_config):
-        """Import a config entry from configuration.yaml."""
-        if self._async_current_entries():
-            _LOGGER.warning("Only one configuration of abode is allowed.")
-            return self.async_abort(reason="single_instance_allowed")
+    async def async_step_gateway(self, user_input=None):
+        """Handle a flow initialized by the user to configure a gateway."""
+        errors = {}
+        if user_input is not None:
+            #token = user_input[CONF_TOKEN]
+            if user_input.get(CONF_HOST):
+                self.host = user_input[CONF_HOST]
 
-        return await self.async_step_user(import_config)
+            # Try to connect to a Xiaomi Gateway.
+            #connect_gateway_class = ConnectXiaomiGateway(self.hass)
+            #await connect_gateway_class.async_connect_gateway(self.host, token)
+            #gateway_info = connect_gateway_class.gateway_info
+
+            if gateway_info is not None:
+                #mac = format_mac(gateway_info.mac_address)
+                unique_id = CONF_HOST
+                await self.async_set_unique_id(unique_id)
+                self._abort_if_unique_id_configured()
+                return self.async_create_entry(
+                    title=user_input[CONF_NAME],
+                    data={
+                        CONF_FLOW_TYPE: CONF_GATEWAY,
+                        CONF_HOST: self.host,
+                        "model": "LazyRolls",
+                    },
+                )
+
+            errors["base"] = "connect_error"
+
+        if self.host:
+            schema = vol.Schema(GATEWAY_SETTINGS)
+        else:
+            schema = GATEWAY_CONFIG
+
+        return self.async_show_form(
+            step_id="gateway", data_schema=schema, errors=errors
+        )
