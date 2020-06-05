@@ -82,7 +82,7 @@ class lazyrolls(CoverDevice):
         self._pos = 100
         self.update()
 
-
+    """ Properties """
     @property
     def name(self):
         """Return the name of the cover."""
@@ -92,8 +92,6 @@ class lazyrolls(CoverDevice):
     def available(self):
         """Return True if entity is available."""
         return self._available
-
-    ################
 
     @property
     def is_closed(self):
@@ -114,6 +112,22 @@ class lazyrolls(CoverDevice):
                 "manufacturer": "LazyRolls"
                 }
 
+    @property
+    def current_cover_position(self):
+        """Return the current position of the cover."""
+        return self._pos
+
+    @property
+    def device_class(self):
+        """Return the class of this device, from component DEVICE_CLASSES."""
+        return 'window'
+
+    @property
+    def supported_features(self):
+        """Flag supported features."""
+        return SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_STOP | SUPPORT_SET_POSITION
+
+    """Methods"""
     def update(self):
         response = requests.get(blindStatus.format(self._ip_addr))
         root = ElementTree.fromstring(response.content)
@@ -128,11 +142,6 @@ class lazyrolls(CoverDevice):
         if (p_now >= p_max): nVal = 1
         _LOGGER.debug("in update Status: " + self._name + " : " + self._ip_addr + " - " + str(
             response.status_code) + " " + response.text)
-
-    @property
-    def current_cover_position(self):
-        """Return the current position of the cover."""
-        return self._pos
 
     def close_cover(self):
         """Close the cover."""
@@ -156,12 +165,4 @@ class lazyrolls(CoverDevice):
             kwargs['position']) + " was succesfull!")
         self.update()
 
-    @property
-    def device_class(self):
-        """Return the class of this device, from component DEVICE_CLASSES."""
-        return 'window'
 
-    @property
-    def supported_features(self):
-        """Flag supported features."""
-        return SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_STOP | SUPPORT_SET_POSITION
