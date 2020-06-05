@@ -6,16 +6,14 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_FRIENDLY_NAME
-from homeassistant.helpers.device_registry import format_mac
 
 # pylint: disable=unused-import
-from .const import DOMAIN
-from .gateway import ConnectXiaomiGateway
+DOMAIN="cover"
 
 _LOGGER = logging.getLogger(__name__)
 
 CONF_FLOW_TYPE = "config_flow_device"
-CONF_GATEWAY = "gateway"
+CONF_GATEWAY = "cover"
 DEFAULT_GATEWAY_NAME = "LazyRolls Cover"
 
 GATEWAY_SETTINGS = {
